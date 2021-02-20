@@ -69,5 +69,27 @@
 ```
 
 ## 정적 콘텐츠 
+**정적 콘텐츠**   
+    
+* WAS기법이 아닌, 즉 모델이 없는 경우 `main/resources/static`에서 html을 찾는다.         
+* server-side-template이나 어떤 프로그래밍을 하는 html은 작성할 수 없다.        
+* 동작 기준-> Controller에 url 관련 매핑이 없을 경우, servlet에서  `main/resources/static`를 찾는다.          
+
+## MVC와 템플릿 엔진 
+**동적 콘텐츠**   
+* `@RequestParam("name")` 필자가 알기론, 파라미터 이름이 같은 경우 자동으로 주입하지만,    
+특별한 상황을 대비해 `@RequestParam("name")`을 통해 요청값을 명확히 가져오는 것이 좋다.     
+* `@RequestParam("name")`의 멤버를 살펴보면 `required`라는 것이 존재한다.  
+* `required`는 디폴트 값으로 true이고, true이기에 존재하기에 해당 파라미터를 넘겨줘야만 `Controller` 맵핑을 실행한다.    
+* 반대로, 우리가 명시적으로 `required=false`한다면, 해당 파라미터가 오지 않아도 매핑을 실행해준다.   
 
 
+**thymeleaf**   
+```html
+<p th:text="'hello' + ${name}">hello! empty</p>
+```    
+`th:text=`로 서버로 넘어온 값이 출력될텐데 `hello! empty`가 왜 필요할까?       
+`thymeleaf`는 서버사이드 템플릿 엔진으로 서버에서 와야 동작한다.     
+하지만, 내용물을 넣어놓음으로써 서버를 실행시키지 않고도 해당 레이아웃을 확인하게끔 해주는 것이다.      
+   
+## API    
