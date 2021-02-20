@@ -17,6 +17,19 @@
 * 패키지에 다른 파일이 없으면 체이닝 형식으로 표기될 때가 많다.(me.kwj1270.sample 이 하나의 디렉터리로 표현)              
 * 프로젝트 네비게이션의 톱니바퀴를 누르면 `[Compact Middle Packages]`가 있으니 이를 클릭해주면 디렉터리가 분리되어 표현된다.          
 
+**실행속도 높이기**
+* 최근 IntelliJ 버전은 Gradle을 통해서 실행 하는 것이 기본 설정이다. 이렇게 하면 실행속도가 느리다.
+* 다음과 같이 변경하면 자바로 바로 실행해서 실행속도가 더 빠르다.
+
+* Preferences -> Build, Execution, Deployment -> Build Tools -> Gradle
+  * Build and run using: Gradle IntelliJ IDEA
+  * Run tests using: Gradle IntelliJ IDEA
+    
+**IntelliJ에서 단축키를 확실하게 검색하는 방법**
+1. File Settings에 들어간다.
+2. keymap을 선택한다.
+3. 검색창에 단축키 이름을 입력한다. 단축키 이름은 위 그림 처럼 영상 하단에 나온다.   
+
 ## 라이브러리 살펴보기
 
 **gradle**         
@@ -82,8 +95,9 @@
 * `@RequestParam("name")`의 멤버를 살펴보면 `required`라는 것이 존재한다.  
 * `required`는 디폴트 값으로 true이고, true이기에 존재하기에 해당 파라미터를 넘겨줘야만 `Controller` 맵핑을 실행한다.    
 * 반대로, 우리가 명시적으로 `required=false`한다면, 해당 파라미터가 오지 않아도 매핑을 실행해준다.   
-
-
+       
+참고: spring-boot-devtools 라이브러리를 추가하면, html 파일을 컴파일만 해주면 서버 재시작 없이 View 파일 변경이 가능하다.         
+   
 **thymeleaf**   
 ```html
 <p th:text="'hello' + ${name}">hello! empty</p>
@@ -93,3 +107,42 @@
 하지만, 내용물을 넣어놓음으로써 서버를 실행시키지 않고도 해당 레이아웃을 확인하게끔 해주는 것이다.      
    
 ## API    
+  
+**@ResponseBody**  
+* `@ResponseBody`를 사용하게되면 HttpMessage의 body 부분에 데이터를 직접 넣는다는 것이다.     
+* 즉, 특정 resolve 작업을 거치지 않고, 리턴하는 값을 바로 메시지에 넣는 것을 의미한다.        
+* 이런 데이터를 JSON으로 내려주면 FrontEnd에서 해당 데이터를 알아서 처리한다고 생각하면 된다.(데이터만 잘 넘기면 된다.)     
+* Model과의 차이점은 서버사이드 템플릿은 우리가 HTML을 조작하는 것이고, API는 데이터만 내려주면 Front에서 HTML을 조작한다는 것이다.       
+* 리턴 값을 String 이 아닌 다른 레퍼런스 값으로 넘긴다면 아래와 같은 데이터로 치환하여 보낸다. (단, **Getter/Setter** 있어야한다.)    
+   
+```java  
+{변수명 : 값}    
+// 클래스의 이름은 나오지 않는다.   
+```
+  
+**동작 방식**      
+* `@ResponseBody` 를 사용
+  * HTTP의 BODY에 문자 내용을 직접 반환
+  * **`viewResolver` 대신에 `HttpMessageConverter`가 동작**   
+    * 기본 문자처리: StringHttpMessageConverter
+    * 기본 객체처리: MappingJackson2HttpMessageConverter
+    * byte 처리 등등 기타 여러 HttpMessageConverter가 기본으로 등록되어 있음
+        
+즉, 문자열 타입이 오면 문자열 그대로 JSON에 넣는다.             
+레퍼런스 타입(객체)가 오면 이를 해석한 후 문자열로 치환하여 JSON에 넣는다. (Jackson 라이브러리 이용)          
+  
+```
+참고: 클라이언트의 HTTP Accept 해더와 서버의 컨트롤러 반환 타입 정보 둘을 조합해서
+HttpMessageConverter 가 선택된다. 더 자세한 내용은 스프링 MVC 강의에서 설명하겠다.
+
+Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
+```   
+
+## 비즈니스 요구사항 정리 
+* 컨트롤러: 웹 MVC의 컨트롤러 역할
+* 서비스: 핵심 비즈니스 로직 구현
+* 리포지토리: 데이터베이스에 접근, 도메인 객체를 DB에 저장하고 관리
+* 도메인: 비즈니스 도메인 객체, 예) 회원, 주문, 쿠폰 등등 주로 데이터베이스에 저장하고 관리됨   
+
+
+
