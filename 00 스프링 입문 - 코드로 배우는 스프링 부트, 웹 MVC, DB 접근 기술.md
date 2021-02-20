@@ -5,13 +5,17 @@
 ## 프로젝트 생성
 **Spring Boot version**      
 * version(SNAPSHOT) : 아직 개발 중인 버전          
-* version(M1) : 정식 릴리즈 전 사용자 테스트 버전               
+* version(M1_Milestone) : 정식 릴리즈 전 사용자 테스트 버전               
 * version : 정식 릴리즈 된 버전, 안정성이 높은 스프링 라이브러리를 제공한다.      
+  
+GA (General Availability)   
+RC (Release Candidate)     
 
 **Project Meatadata**
 * Group : 도메인주소(기업 도메인,즉 부서 입력 전까지)
 * Artifact : 빌드되어 나올 때 나오는 결과물의 이름 
 * Name : 프로젝트의 이름 
+
 
 **package(디렉터리) 분리하기**     
 * 패키지에 다른 파일이 없으면 체이닝 형식으로 표기될 때가 많다.(me.kwj1270.sample 이 하나의 디렉터리로 표현)              
