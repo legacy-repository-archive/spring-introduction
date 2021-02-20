@@ -29,5 +29,49 @@
 * 외장 톰캣을 쓴다면, 웹 서버 프로그램을 실행시키고 자바 코드를 밀어 넣는 식이었다.         
 * 요즘에는 소스 라이브러리에서 웹 서버를 들고 있다.(임베디드 서버)       
 * 그렇기에 따로 설정할 필요 없이 실행만 하더라도 서버 실행 및 애플리케이션을 배포할 수 있다.        
+    
+**로그**          
+* 현업에서는 로그를 주로 이용한다.           
+* 로그로 남기면, 심각한 에러만 따로 모아놓을 수 있고 로그 파일들을 관리할 수 있다.        
+* 이전에는 `slf4j`를 많이 썼는데, 요즘에는 `logback`으로 넘어가는 추세이다.    
 
-## 라이브러리 살펴보기 
+## View 환경 설정   
+
+**server-side-template**
+* 서버 사이드 템플릿 엔진을 사용하고자 한다면 관련 dependency를 의존하도록 하자      
+  * `implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'`
+* 추가로 검색해서 알았는데, mustache 처럼 헤더 풋터를 만들어 레이앗처럼 사용하고자 한다면 아래와 같은 라이브러리도 의존 받는다.   
+  * `implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'`        
+* 아직, 사용법은 모르지만 언젠가 쓸 일이 있다면 그 때 검색해보자     
+
+**웹 동작 과정**   
+* 클라이언트 -> 서버(tomcat)  
+* 서버(tomcat)의 servlet이 controller 호출
+* 비즈니스로직 처리
+* controller -> 모델을 가지고 -> servlet
+* servlet 에서 viewResolver 및 forward
+  * `resources:template/`+vireName(Controller 리턴값)+`.html`    
+* client는 model을 받음  
+
+## 빌드하고 실행하기
+빌드파일 : 하나의 애플리케이션, 관련 라이브러리를 다운받았기에 실행시키기만 하면 바로 애플리케이션이 실행된다.     
+우리 같은 경우는 서버가 실행되기에, 도메인을 통해 웹 애플리케이션에 접근 가능하다.    
+       
+빌드를 진행하기전에 서버 실행한 것을 꺼야 된다.(필수!)(포트 충돌로 한 쪽 실행안됨)       
+**빌드파일 생성**  
+```gradle
+./gradlew build
+```   
+  
+**모든 빌드파일 삭제** 
+```gradle
+./gradlew clean build
+```
+
+
+
+## 톰캣 
+
+implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'서버 
+implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect
+
