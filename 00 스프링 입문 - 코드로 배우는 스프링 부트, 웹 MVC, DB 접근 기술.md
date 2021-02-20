@@ -68,10 +68,6 @@
 ./gradlew clean build
 ```
 
+## 정적 콘텐츠 
 
-
-## 톰캣 
-
-implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'서버 
-implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect
 
