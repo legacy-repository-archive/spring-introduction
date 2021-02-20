@@ -394,3 +394,69 @@ DB 및 스프링을 사용해서 테스트하니 아래 2개의 어노테이션�
 * `@Transactional` : 테스트 케이스에 이 애노테이션이 있으면, 테스트 시작 전에 트랜잭션을 시작하고,      
 테스트 완료 후에 항상 롤백한다. 이렇게 하면 DB에 데이터가 남지 않으므로 다음 테스트에 영향을 주지 않는다.      
 
+## JPA   
+JPA에 대해서는 다른 레포에 많이 기술했으므로 넘어간다.  
+
+```java
+//implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'   
+```
+`spring-boot-starter-data-jpa`에서는 `jdbc`관련 라이브러리를 포함하고 있으므로 `jdbc`는 생략해도 된다.      
+       
+```properties
+spring.datasource.url=jdbc:h2:tcp://localhost/~/test
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=none
+```
+> 주의!: 스프링부트 2.4부터는 spring.datasource.username=sa 를 꼭 추가해주어야 한다. 
+> 그렇지 않으면 오류가 발생한다.   
+    
+* show-sql : JPA가 생성하는 SQL을 출력한다.
+* ddl-auto : JPA는 테이블을 자동으로 생성하는 기능을 제공하는데 none 를 사용하면 해당 기능을 끈다.
+  * create 를 사용하면 엔티티 정보를 바탕으로 테이블도 직접 생성해준다. (기존 테이블 지우고 새로 생성함)   
+
+```java
+
+package hello.hellospring.repository;
+
+import hello.hellospring.domain.Member;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Optional;
+
+public class JpaMemberRepository implements MemberRepository {
+    private final EntityManager em;
+
+    public JpaMemberRepository(EntityManager em) {
+        this.em = em;
+    }
+
+    public Member save(Member member) {
+        em.persist(member);
+        return member;
+    }
+
+    public Optional<Member> findById(Long id) {
+        Member member = em.find(Member.class, id);
+        return Optional.ofNullable(member);
+    }
+
+    public List<Member> findAll() {
+        return em.createQuery("select m from Member m", Member.class)
+                .getResultList();
+    }
+
+    public Optional<Member> findByName(String name) {
+        List<Member> result = em.createQuery("select m from Member m where
+                m.name = :name ", Member.class)
+                .setParameter("name", name)
+                .getResultList();
+        return result.stream().findAny();
+    }
+}
+```
+이전에 나는 `JpaRepository<K,V>`를 인터페이스 상속받아 사용했는데  
+직접 `EntityManager`를 의존성 주입받아 레포지토리를 만들 수 있다는 것을 배웠다.   
