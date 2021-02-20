@@ -101,7 +101,16 @@ RC (Release Candidate)
 * 반대로, 우리가 명시적으로 `required=false`한다면, 해당 파라미터가 오지 않아도 매핑을 실행해준다.   
        
 참고: spring-boot-devtools 라이브러리를 추가하면, html 파일을 컴파일만 해주면 서버 재시작 없이 View 파일 변경이 가능하다.         
-   
+
+```
+devtools(Developer Tools)는 스프링 부트에서 제공하는 개발 편의를 위한 모듈이다. 
+주로 변경된 코드를 서버 또는 화면에 신속하게 반영해 결과를 확인하기 위해서 사용한다.
+
+dev tools 는 일반적으로 서버를 내렸다 올리는 식의 재시작 방법보다 더 빠르게 재시작할 수 있다.     
+Devtools는 classpath에 변경이 생기면 이를 감지해 재시작 여부를 판단하게 된다.      
+프로그램이 실행되면 polling을 통해 주기적으로 classpath의 변경여부를 확인하고 있기 때문에 가능한 부분이다     
+```
+
 **thymeleaf**   
 ```html
 <p th:text="'hello' + ${name}">hello! empty</p>
