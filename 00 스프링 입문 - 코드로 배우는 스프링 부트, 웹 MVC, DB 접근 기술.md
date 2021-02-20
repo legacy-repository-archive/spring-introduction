@@ -503,3 +503,40 @@ public class SpringConfig {
 ```
 이제 또 빈 등록을 하는데 DataSource랑, EntityManager가 필요하다.  
 이를 의존성 주입받아서 레포클래스를 올리자  
+
+## SpringDataJPA   
+스프링 데이터 JPA는 JPA를 편리하게 사용하도록 도와주는 기술입니다.     
+따라서 JPA를 먼저 학습한 후에 스프링 데이터 JPA를 학습해야합니다.     
+
+```java
+package hello.hellospring.repository;
+import hello.hellospring.domain.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface SpringDataJpaMemberRepository extends JpaRepository<Member,
+        Long>, MemberRepository {
+    Optional<Member> findByName(String name);
+}   
+```   
+    
+**스프링 데이터 JPA 제공 기능**   
+* 인터페이스를 통한 기본적인 CRUD     
+* findByName() , findByEmail() 처럼 메서드 이름 만으로 조회 기능 제공     
+* 페이징 기능 자동 제공   
+      
+![JpaRepositoryDependencies.png](./images/JpaRepositoryDependencies.png)            
+    
+> 참고: 실무에서는 JPA와 스프링 데이터 JPA를 기본으로 사용하고, 복잡한 동적 쿼리는 Querydsl이라는 라이브러리를 사용하면 된다.     
+Querydsl을 사용하면 쿼리도 자바 코드로 안전하게 작성할 수 있고, 동적 쿼리도 편리하게 작성할 수 있다.       
+이 조합으로 해결하기 어려운 쿼리는 JPA가 제공하는 네이티브 쿼리를 사용하거나, 앞서 학습한 스프링 JdbcTemplate를 사용하면 된다.         
+       
+스프링 데이터 JPA는 **` JpaRepository<V, K>,`를 상속한 인터페이스를 알아서 구현해주고 스프링 빈으로 자동 등록해준다.**         
+이 과정에서 `@Repository` 어노테이션도 붙여줘야 하지만, 생략해도 되게 해주는 장점이 있다.          
+또한 추상메서드의 이름에 규칙이 있어 이를 잘만 활용하면 이름만으로도 내가 원하는 쿼리를 만들 수 있다.              
+      
+## AOP  
+
+         
+   
