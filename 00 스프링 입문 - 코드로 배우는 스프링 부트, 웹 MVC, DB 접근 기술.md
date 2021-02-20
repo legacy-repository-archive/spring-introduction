@@ -1,6 +1,6 @@
 # 스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술
-스프링에 대해서 이미 어느정도 공부를 진행했기에  
-여기서는 몰랐던 내용들에 대해서만 **기록** 차원으로 글을 작성하고자 합니다.     
+스프링에 대해서 이미 어느정도 공부를 진행했기에    
+여기서는 몰랐던 내용들이나 이미 알고 있지만, 중요한 내용에 대해서 **기록** 차원으로 글을 작성하고자 합니다.        
 
 ## 프로젝트 생성
 **Spring Boot version**      
@@ -99,7 +99,6 @@ RC (Release Candidate)
 * `@RequestParam("name")`의 멤버를 살펴보면 `required`라는 것이 존재한다.  
 * `required`는 디폴트 값으로 true이고, true이기에 존재하기에 해당 파라미터를 넘겨줘야만 `Controller` 맵핑을 실행한다.    
 * 반대로, 우리가 명시적으로 `required=false`한다면, 해당 파라미터가 오지 않아도 매핑을 실행해준다.   
-       
 참고: spring-boot-devtools 라이브러리를 추가하면, html 파일을 컴파일만 해주면 서버 재시작 없이 View 파일 변경이 가능하다.         
 
 ```
@@ -111,6 +110,10 @@ Devtools는 classpath에 변경이 생기면 이를 감지해 재시작 여부�
 프로그램이 실행되면 polling을 통해 주기적으로 classpath의 변경여부를 확인하고 있기 때문에 가능한 부분이다     
 ```
 
+```
+이외에도 스프링은 request시에 파라미터 이름과 같은 변수가 있으면 클래스에 자동으로 값을 할당해준다.  
+단, setter나 파라미터에 맞는 생성자가 있어야 한다.        
+```
 **thymeleaf**   
 ```html
 <p th:text="'hello' + ${name}">hello! empty</p>
@@ -304,18 +307,90 @@ public class SpringConfig {
 예를들어, `return new MemoryMemberRepository();` 대신에    
 `return new DbMemberRepository();`로 바꿀 수 있으며, 
 다른 코드는 수정하지 않아도 된다. (여기서는 레포지토리인데 이것 말고 다른 클래스일때 쓴다는거다)        
-
     
 > **주의:** @Autowired 를 통한 DI는 helloController , memberService 등과 같이 스프링이 관리하는 객체에서만 동작한다. 
 `@Autowired`는 스프링 빈으로 등록하지 않고 내가 직접 생성한 객체에서는 동작하지 않는다.       
-   
+     
+
+     
 ## 스프링 DB 접근 기술    
-**h2 접속시**   
+* h2 데이터베이스 버전은 스프링 부트 버전에 맞춘다.
+* 권한 주기: chmod 755 h2.sh
+* 실행: ./h2.sh
+* 데이터베이스 파일 생성 방법
+  * jdbc:h2:~/test (최초 한번)
+  * ~/test.mv.db 파일 생성 확인
+  * 이후부터는 jdbc:h2:tcp://localhost/~/test 이렇게 접속  
+* 로그인 하고 나서 혹시 문제가 생기면 `test.mv.db`를 지우고 다시하자  
+* 영한님은 프로젝트 바로 밑에 sql 디렉터리르 만들어서 sql을 관리함 -> 버저관리도 가능하니까   
 
-* 기존 : `jdbc:h2:~/test`      
-* 권장 : `jdbc:h2:ㅅ체://localhost/~/test`로 들어가는 것이 좋다    
+**build.gradle**
+```gradle 
+implementation 'org.springframework.boot:spring-boot-starter-jdbc' // 의존성 있어야 DB사용 가능     
+runtimeOnly 'com.h2database:h2' // 의존성 있어야 DB랑 붙을 때, 데이터베이스가 필요하느 클라이언트 제공(드라이버)
+```
 
-파일로 접근하면 애플리케이션이랑 웹 콘솔이랑 같이 접근시 충돌 날 수 있다.   
+**resources/application.properties**
+```properties
+spring.datasource.url=jdbc:h2:tcp://localhost/~/test
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+```
+필자 기준으로 Datasource 빈을 등록해주어야 했는데 부트에서는 설정파일에서 바로 할 수 있다.      
+정확히 말하면 AutoConfiguration으로 이 정보를 토대로 `Datasource`빈을 만들어 활용하는 것  
+참고로 **공백 또한 값으로 포함되므로 앞뒤 공백을 주의해야한다.**    
+패스워드 값도 존재하면 `spring.datasource.password=패스워드값`를 넣어 줘야한다.     
 
+```
+DataSource는 데이터베이스 커넥션을 획득할 때 사용하는 객체다. 스프링 부트는 데이터베이스 커넥션
+정보를 바탕으로 DataSource를 생성하고 스프링 빈으로 만들어둔다. 그래서 DI를 받을 수 있다.
+```
 
+```java
+package hello.hellospring;
+import hello.hellospring.repository.JdbcMemberRepository;
+import hello.hellospring.repository.JdbcTemplateMemberRepository;
+import hello.hellospring.repository.MemberRepository;
+import hello.hellospring.repository.MemoryMemberRepository;
+import hello.hellospring.service.MemberService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import javax.sql.DataSource;
+
+@Configuration
+public class SpringConfig {
+    private final DataSource dataSource;
+
+    public SpringConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Bean
+    public MemberService memberService() {
+        return new MemberService(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        // return new MemoryMemberRepository();
+        return new JdbcMemberRepository(dataSource);
+    }
+}
+```
+빈 등록을 바꾸지만,  
+이의존받는 곳에서 `MemoryMemberRepository`와 `JdbcMemberRepository(dataSource);`의 인터페이스로 의존받는다면  
+더 이상의 코드를 수정할 필요없이 의존받는 객체를 바꿔서 사용할 수 있다.      
+   
+이것이 OCP : 개방폐쇄원칙      
+        
+개방폐쇄원칙, (매우 중요)    
+확장에는 열려 있고, 수정, 변경에는 닫혀있다.      
+스프링의 DI를 사용하면, **기존 코드를 전혀 손대지 않고, 설정만으로 구현 클래스를 변경할 수 있다.**       
+
+## CRUD를 완성했다면 통합테스트 해보자  
+DB 및 스프링을 사용해서 테스트하니 아래 2개의 어노테이션을 클래스 위에 붙여주자  
+  
+* `@SpringBootTest` : 스프링 컨테이너와 테스트를 함께 실행한다. (컴포넌트 스캔이 되어서 모든 빈 사용가능 -> DI가능)    
+* `@Transactional` : 테스트 케이스에 이 애노테이션이 있으면, 테스트 시작 전에 트랜잭션을 시작하고,      
+테스트 완료 후에 항상 롤백한다. 이렇게 하면 DB에 데이터가 남지 않으므로 다음 테스트에 영향을 주지 않는다.      
 
