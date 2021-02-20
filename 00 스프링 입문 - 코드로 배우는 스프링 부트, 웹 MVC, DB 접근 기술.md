@@ -176,12 +176,62 @@ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
 클래스 설계가 처음부터 완벽하게 된다면 일반적인 방법으로 하면 된다.     
 하지만, 반대로 클래스 설계를 하기 힘들다거나 아니면 설계가 있는데 추가적인 기능을 넣어야 할 것 같거나      
 아니면 만들 클래스의 라인이 예를들어 몇백줄이라 치면, 차라리 테스트를 만들고 클래스를 구현하는 것이 더 좋을 수 있다.   
+  
+`./gradlew test`로 테스트 할 수도 있다.      
+전체 테스트 클래스를 테스트하고 싶다면 테스트 디렉터리에서 런하면 된다.   
+   
+**테스트는 맞는 로직만 검사하는 것이 아니다.**    
+엣지케이스나 실패케이스를 넣어서 실패하는지도 확인해야한다.      
+일부러 예외를 발생시키고, 예외가 발생했는지 테스팅을 하면 된다.   
+이 부분은 정말 중요하다고 생각한다.
+예외사항이 우리가 원하는 상황에 발생하는지, 그리고 맞는 테스트케이스만 짜는게 아니라 실패하는 테스트케이스를 짜는 생각이 넓어진다.       
+   
+## 서비스 개발 
 
-`./gradlew test`로 테스트 할 수도 있다.   
+```java
+public Long join(Member member){
+    
+    Optional<Member> result = memberRepository.findByName(member.getName());
+    result.ifPresent(m -> {
+        throw new IllegalStateException("이미 존재하는 회원입니다.");   
+    });
+    
+    memberRepository.save(member);
+    return member.getId();
+}
+```
+이 코드에서 변경을 할 필요가 있는 권장사항이 있다.     
+`Optional<E> instance` 를 사용하는 것은 별로 권장하지 않는다.  
+우선 이쁘지 않으며 가독성을 떨어뜨린다.   
+
+그렇기에 참조 변수를 만들어 할당하기 보다, 바로 사용하는 것이 좋다.  
+예를 들면 아래와 같이 코딩을 해야한다.  
+
+```java
+public Long join(Member member){
+    
+    memberRepository.findByName(member.getName())
+      .ifPresent(m -> {
+          throw new IllegalStateException("이미 존재하는 회원입니다.");   
+      });
+    
+    memberRepository.save(member);
+    return member.getId();
+}
+```    
+그리고 위 메서드에서 있는지 없는지 검증하는 역할은 따로 메서드로 뽑을 수 있다.       
+(저장, 조회 2가지 역할을 메서드에서 하고 있으니 이를 각각 하나의 기능만 수행하도록 메서드로 뽑는다.)       
+맥에서는 범위만큼 드래그 한 후 `control + T`를 누르고 `[extract method]`눌러 따로 메서드로 뽑아 분리할 수 있다.       
+더 쉽게 하는 방법은 `command + option + m`이 있다.   
 
 ## 
 
 
+
+
+
+추가로 `Optional 인스턴스`에서 값을 꺼낼때는 `get()`보단, `orElseGet()`을 사용하여   
+값이 있을 때 꺼내고, 값이 없을 때 꺼내지 않는 방식의 코드를 짜는 것이 훨씬좋다.     
 
 ## 
 
