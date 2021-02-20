@@ -460,3 +460,46 @@ public class JpaMemberRepository implements MemberRepository {
 ```
 이전에 나는 `JpaRepository<K,V>`를 인터페이스 상속받아 사용했는데  
 직접 `EntityManager`를 의존성 주입받아 레포지토리를 만들 수 있다는 것을 배웠다.   
+
+* `org.springframework.transaction.annotation.Transactional` 를 사용하자.    
+스프링은 해당 클래스의 메서드를 실행할 때 트랜잭션을 시작하고, 메서드가 정상 종료되면 트랜잭션을 커밋한다.     
+만약 런타임 예외가 발생하면 롤백한다.       
+**JPA를 통한 모든 데이터 변경은 트랜잭션 안에서 실행해야 한다.**   
+
+```java
+package hello.hellospring;
+
+import hello.hellospring.repository.*;
+import hello.hellospring.service.MemberService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+
+@Configuration
+public class SpringConfig {
+    private final DataSource dataSource;
+    private final EntityManager em;
+
+    public SpringConfig(DataSource dataSource, EntityManager em) {
+        this.dataSource = dataSource;
+        this.em = em;
+    }
+
+    @Bean
+    public MemberService memberService() {
+        return new MemberService(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+// return new MemoryMemberRepository();
+// return new JdbcMemberRepository(dataSource);
+// return new JdbcTemplateMemberRepository(dataSource);
+        return new JpaMemberRepository(em);
+    }
+}
+```
+이제 또 빈 등록을 하는데 DataSource랑, EntityManager가 필요하다.  
+이를 의존성 주입받아서 레포클래스를 올리자  
