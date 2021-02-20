@@ -186,6 +186,13 @@ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
 이 부분은 정말 중요하다고 생각한다.
 예외사항이 우리가 원하는 상황에 발생하는지, 그리고 맞는 테스트케이스만 짜는게 아니라 실패하는 테스트케이스를 짜는 생각이 넓어진다.       
    
+**테스트를 할 때는 같은 객체로**   
+데이터베이스를 접근하는 레포지토리나, 객체를 한개만 사용해도 되는 경우에는 빈을 등록하고 의존성을 받아서 사용하자  
+굳이 2개를 만들면, 서로 데이터가 달라지는 문제가 발생할 수 있다.   
+대신, 데이터베이스를 테스트 할 때마다 초기화하면 아주 끔직해진다.   
+이에 맞춰서 클래스에 따라 초기화 하는 경우, 그리고 테스트 후 롤백하는 경우 이런걸 잘 파악해야한다.   
+   
+      
 ## 서비스 개발 
 
 ```java
@@ -223,15 +230,87 @@ public Long join(Member member){
 (저장, 조회 2가지 역할을 메서드에서 하고 있으니 이를 각각 하나의 기능만 수행하도록 메서드로 뽑는다.)       
 맥에서는 범위만큼 드래그 한 후 `control + T`를 누르고 `[extract method]`눌러 따로 메서드로 뽑아 분리할 수 있다.       
 더 쉽게 하는 방법은 `command + option + m`이 있다.   
-
-## 
-
-
-
-
-
+   
 추가로 `Optional 인스턴스`에서 값을 꺼낼때는 `get()`보단, `orElseGet()`을 사용하여   
 값이 있을 때 꺼내고, 값이 없을 때 꺼내지 않는 방식의 코드를 짜는 것이 훨씬좋다.     
 
-## 
+## 컴포넌트 스캔과 자동 의존관계 설정   
+의존하다 : A클래스에서 B클래스를 받아서 사용하는 관계, **A는 B의 의존관계다.**   
+
+`@Controller`, `@Service`, `@Repository`, `@Bean`, `@Component`와 같은 어노테이션을 사용하면 
+스프링 컨테이너에 객체를 생성해서 컨테이너에 넣고 스프링이 관리한다.   
+그리고 빈에 등록된 객체를 사용하려는, 즉 의존하려는 객체는 new 하지않고, 주입받아서 사용하면 된다. (생성자, Setter)   
+단, 앞서 말했듯이 어노테이션을 통해 빈으로 등록해주어야 한다.   
+      
+컨테이너에 등록할 빈에 대한 전략은 여러가지인데 기본적으로 싱글톤 패턴으로 설정되어있다.       
+설정으로 싱글톤이 아니게 설정할 수 있지만, 특별한 경우를 제외하면 대부분 싱글톤을 사용한다.    
+   
+**스프링 빈을 등록하는 2가지 방법**
+* 컴포넌트 스캔과 자동 의존관계 설정
+* 자바 코드로 직접 스프링 빈 등록하기
+    
+**컴포넌트 스캔 원리**
+@Component 애노테이션이 있으면 스프링 빈으로 자동 등록된다.
+
+* @Controller 컨트롤러가 스프링 빈으로 자동 등록된 이유도 컴포넌트 스캔 때문이다.
+* @Component 를 포함하는 다음 애노테이션도 스프링 빈으로 자동 등록된다.
+  * @Controller
+  * @Service
+  * @Repository
+  * 등등.
+* @ComponentScan이 등록된 같은, 하위 패키지만 빈 등록 대상이 된다.      
+
+**의존 받기**
+* 생성자에 @Autowired 를 사용하면     
+객체 생성 시점에 스프링 컨테이너에서 해당 스프링 빈을 찾아서 주입한다.    
+* 생성자가 1개만 있으면 @Autowired 는 생략할 수 있다.     
+
+**자바 코드로 직접 Bean 등록하기**   
+```java
+package hello.hellospring;
+import hello.hellospring.repository.MemberRepository;
+import hello.hellospring.repository.MemoryMemberRepository;
+import hello.hellospring.service.MemberService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SpringConfig {
+    @Bean
+    public MemberService memberService() {
+        return new MemberService(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+}
+```
+`@Configuration`을 클래스에 넣어주고    
+`@Bean`을 통해 인스턴스를 만들고 리턴하면        
+해당 객체가 컨테이너에 등록되어진다.         
+
+> 참고: XML로 설정하는 방식도 있지만 최근에는 잘 사용하지 않으므로 생략한다.   
+       
+> 참고: DI에는 필드 주입, setter 주입, 생성자 주입 이렇게 3가지 방법이 있다.        
+의존관계가 실행중에 동적으로 변하는 경우는 거의 없으므로 생성자 주입을 권장한다. (제일 안전하다)     
+           
+> 참고: 실무에서는 주로 **정형화된 컨트롤러, 서비스, 리포지토리 같은 코드는 컴포넌트 스캔을 사용한다.**       
+그리고 **정형화 되지 않거나, `상황에 따라 구현 클래스를 변경`해야 하면 설정을 통해 스프링 빈으로 등록한다.**   
+즉, 변경 가능성이 있는 클래스들은 직접 만들어 올린다.   
+예를들어 강의에서 실제 데이터베이스와 연동되지 않느 클래스를 사용하는데, 이후 바꿀 예정이라면 `@bean` 사용     
+
+예를들어, `return new MemoryMemberRepository();` 대신에    
+`return new DbMemberRepository();`로 바꿀 수 있으며, 
+다른 코드는 수정하지 않아도 된다. (여기서는 레포지토리인데 이것 말고 다른 클래스일때 쓴다는거다)        
+
+    
+> **주의:** @Autowired 를 통한 DI는 helloController , memberService 등과 같이 스프링이 관리하는 객체에서만 동작한다. 
+`@Autowired`는 스프링 빈으로 등록하지 않고 내가 직접 생성한 객체에서는 동작하지 않는다.       
+   
+   
+
+
+
 
