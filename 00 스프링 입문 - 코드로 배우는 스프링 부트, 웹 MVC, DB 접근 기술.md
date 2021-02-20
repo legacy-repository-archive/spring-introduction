@@ -309,8 +309,13 @@ public class SpringConfig {
 > **주의:** @Autowired 를 통한 DI는 helloController , memberService 등과 같이 스프링이 관리하는 객체에서만 동작한다. 
 `@Autowired`는 스프링 빈으로 등록하지 않고 내가 직접 생성한 객체에서는 동작하지 않는다.       
    
-   
+## 스프링 DB 접근 기술    
+**h2 접속시**   
 
+* 기존 : `jdbc:h2:~/test`      
+* 권장 : `jdbc:h2:ㅅ체://localhost/~/test`로 들어가는 것이 좋다    
+
+파일로 접근하면 애플리케이션이랑 웹 콘솔이랑 같이 접근시 충돌 날 수 있다.   
 
 
 
