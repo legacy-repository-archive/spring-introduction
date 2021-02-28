@@ -1,38 +1,37 @@
-# 스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술
-스프링에 대해서 이미 어느정도 공부를 진행했기에    
-여기서는 몰랐던 내용들이나 이미 알고 있지만, 중요한 내용에 대해서 **기록** 차원으로 글을 작성하고자 합니다.        
-
-## 프로젝트 생성
+# 💻 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술
+> 해당 마크다운은 필자가 몰랐거나, 중요하다고 생각하는 내용만 정리할 것입니다.   
+   
+💡 이 마크다운은 김영한님의 인프런 강의 [스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-%EC%9E%85%EB%AC%B8-%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8/dashboard)을 팔로우하고 있습니다.   
+🔌 보다 자세한 내용과 설명은 백기선님의 온라인 강의를 듣는 것을 적극 추천드립니다.         
+      
+# 프로젝트 생성
 **Spring Boot version**      
 * version(SNAPSHOT) : 아직 개발 중인 버전          
 * version(M1_Milestone) : 정식 릴리즈 전 사용자 테스트 버전               
-* version : 정식 릴리즈 된 버전, 안정성이 높은 스프링 라이브러리를 제공한다.      
-  
-GA (General Availability)   
-RC (Release Candidate)     
-
+* version : 정식 릴리즈 된 버전, 안정성이 높은 스프링 라이브러리를 제공한다.          
+    
 **Project Meatadata**
 * Group : 도메인주소(기업 도메인,즉 부서 입력 전까지)
 * Artifact : 빌드되어 나올 때 나오는 결과물의 이름 
 * Name : 프로젝트의 이름 
-
-
+    
 **package(디렉터리) 분리하기**     
-* 패키지에 다른 파일이 없으면 체이닝 형식으로 표기될 때가 많다.(me.kwj1270.sample 이 하나의 디렉터리로 표현)              
-* 프로젝트 네비게이션의 톱니바퀴를 누르면 `[Compact Middle Packages]`가 있으니 이를 클릭해주면 디렉터리가 분리되어 표현된다.          
+* 패키지에 다른 파일이 없으면 체이닝 형식으로 표기될 때가 많다.(`me.kwj1270.sample`이 하나의 디렉터리로 표현)              
+* 프로젝트 네비게이션의 톱니바퀴를 누르면 `[Compact Middle Packages]`가 있으니     
+  이를 클릭해주면 디렉터리가 분리되어 표현된다.          
 
 **실행속도 높이기**
-* 최근 IntelliJ 버전은 Gradle을 통해서 실행 하는 것이 기본 설정이다. 이렇게 하면 실행속도가 느리다.
-* 다음과 같이 변경하면 자바로 바로 실행해서 실행속도가 더 빠르다.
-
-* Preferences -> Build, Execution, Deployment -> Build Tools -> Gradle
+최근 IntelliJ 버전은 `Gradle`을 통해서 실행 하는 것이 기본 설정이며 실행속도가 느리다.   
+다음과 같이 변경하면 자바로 바로 실행해서 실행속도가 더 빠르다.
+     
+* `Preferences` -> `Build, Execution, Deployment` -> `Build Tools` -> `Gradle`
   * Build and run using: Gradle IntelliJ IDEA
   * Run tests using: Gradle IntelliJ IDEA
     
 **IntelliJ에서 단축키를 확실하게 검색하는 방법**
-1. File Settings에 들어간다.
-2. keymap을 선택한다.
-3. 검색창에 단축키 이름을 입력한다. 단축키 이름은 위 그림 처럼 영상 하단에 나온다.   
+1. `File Settings`에 들어간다.
+2. `keymap`을 선택한다.
+3. 검색창에 단축키 이름을 입력한다.   
 
 ## 라이브러리 살펴보기
 
