@@ -176,7 +176,7 @@ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
 그렇기에 동적인 형태 -> 행동을 만들어 테스트 케이스를 작성하고 이에 맞게끔 클래스를 설계하자       
       
 그리고 이러한 방식을 우리는 `TDD`라고 부른다.      
-요즘 대세이지만 꼭 TDD 방식으로 진행하지 않아도 된다      
+요즘 대세이지만 꼭 `TDD` 방식으로 진행하지 않아도 된다      
 클래스 설계가 처음부터 완벽하게 된다면 일반적인 방법으로 하면 된다.        
 하지만, 반대로 **클래스 설계를 하기 힘들다거나 아니면    
 설계가 있는데 추가적인 기능을 넣어야 할 것 같거나             
@@ -201,7 +201,6 @@ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
    
       
 ## 서비스 개발 
-
 ```java
 public Long join(Member member){
     
@@ -308,7 +307,7 @@ public class SpringConfig {
 즉, 변경 가능성이 있는 클래스들은 직접 만들어 올린다.   
 예를들어 강의에서 실제 데이터베이스와 연동되지 않느 클래스를 사용하는데, 이후 바꿀 예정이라면 `@bean` 사용     
 
-예를들어, `return new MemoryMemberRepository();` 대신에    
+예를 들어, `return new MemoryMemberRepository();` 대신에    
 `return new DbMemberRepository();`로 바꿀 수 있으며, 
 다른 코드는 수정하지 않아도 된다. (여기서는 레포지토리인데 이것 말고 다른 클래스일때 쓴다는거다)        
       
@@ -319,14 +318,14 @@ public class SpringConfig {
      
 ## 스프링 DB 접근 기술    
 * h2 데이터베이스 버전은 스프링 부트 버전에 맞춘다.
-* 권한 주기: chmod 755 h2.sh
-* 실행: ./h2.sh
+* 권한 주기: `chmod 755 h2.sh`
+* 실행: `./h2.sh`
 * 데이터베이스 파일 생성 방법
-  * jdbc:h2:~/test (최초 한번)
-  * ~/test.mv.db 파일 생성 확인
-  * 이후부터는 jdbc:h2:tcp://localhost/~/test 이렇게 접속  
+  * `jdbc:h2:~/test` (최초 한번)
+  * `~/test.mv.db` 파일 생성 확인
+  * 이후부터는 `jdbc:h2:tcp://localhost/~/test` 이렇게 접속  
 * 로그인 하고 나서 혹시 문제가 생기면 `test.mv.db`를 지우고 다시하자  
-* 영한님은 프로젝트 바로 밑에 sql 디렉터리르 만들어서 sql을 관리함 -> 버저관리도 가능하니까   
+* 영한님은 프로젝트 바로 밑에 sql 디렉터리르 만들어서 sql을 관리함 -> 버전관리도 가능하니까   
 
 **build.gradle**
 ```gradle 
@@ -340,8 +339,8 @@ spring.datasource.url=jdbc:h2:tcp://localhost/~/test
 spring.datasource.driver-class-name=org.h2.Driver
 spring.datasource.username=sa
 ```
-필자 기준으로 Datasource 빈을 등록해주어야 했는데 부트에서는 설정파일에서 바로 할 수 있다.      
-정확히 말하면 AutoConfiguration으로 이 정보를 토대로 `Datasource`빈을 만들어 활용하는 것  
+필자 기준으로 `Datasource` 빈을 등록해주어야 했는데 부트에서는 설정파일에서 바로 할 수 있다.      
+정확히 말하면 `AutoConfiguration`으로 이 정보를 토대로 `Datasource`빈을 만들어 활용하는 것  
 참고로 **공백 또한 값으로 포함되므로 앞뒤 공백을 주의해야한다.**    
 패스워드 값도 존재하면 `spring.datasource.password=패스워드값`를 넣어 줘야한다.     
 
@@ -383,21 +382,17 @@ public class SpringConfig {
 ```
 빈 등록을 바꾸지만,  
 이의존받는 곳에서 `MemoryMemberRepository`와 `JdbcMemberRepository(dataSource);`의 인터페이스로 의존받는다면  
-더 이상의 코드를 수정할 필요없이 의존받는 객체를 바꿔서 사용할 수 있다.      
-   
-이것이 OCP : 개방폐쇄원칙      
-        
-개방폐쇄원칙, (매우 중요)    
-확장에는 열려 있고, 수정, 변경에는 닫혀있다.      
-스프링의 DI를 사용하면, **기존 코드를 전혀 손대지 않고, 설정만으로 구현 클래스를 변경할 수 있다.**       
-
+더 이상의 코드를 수정할 필요없이 의존받는 객체를 바꿔서 사용할 수 있다.        
+그리고 이것이 `OCP`, **확장에는 열려 있고 변경에는 닫혀있다는 개방폐쇄원칙이다.**                        
+즉, 스프링에 `DI`를 사용하면, **기존 코드를 전혀 손대지 않고, 설정만으로 구현 클래스를 변경할 수 있다.**             
+     
 ## CRUD를 완성했다면 통합테스트 해보자  
 DB 및 스프링을 사용해서 테스트하니 아래 2개의 어노테이션을 클래스 위에 붙여주자  
   
 * `@SpringBootTest` : 스프링 컨테이너와 테스트를 함께 실행한다. (컴포넌트 스캔이 되어서 모든 빈 사용가능 -> DI가능)    
-* `@Transactional` : 테스트 케이스에 이 애노테이션이 있으면, 테스트 시작 전에 트랜잭션을 시작하고,      
-테스트 완료 후에 항상 롤백한다. 이렇게 하면 DB에 데이터가 남지 않으므로 다음 테스트에 영향을 주지 않는다.      
-
+* `@Transactional` : 테스트 케이스에 이 애노테이션이 있으면, 테스트 시작 전에 트랜잭션을 시작하고,        
+**테스트 완료 후에 항상 롤백한다.** 이렇게 하면 DB에 데이터가 남지 않으므로 다음 테스트에 영향을 주지 않는다.        
+    
 ## JPA   
 JPA에 대해서는 다른 레포에 많이 기술했으므로 넘어간다.  
 
@@ -414,15 +409,14 @@ spring.datasource.username=sa
 spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=none
 ```
-> 주의!: 스프링부트 2.4부터는 spring.datasource.username=sa 를 꼭 추가해주어야 한다. 
+> 주의!: 스프링부트 2.4 부터는 `spring.datasource.username=sa`를 꼭 추가해주어야 한다. 
 > 그렇지 않으면 오류가 발생한다.   
-    
+       
 * show-sql : JPA가 생성하는 SQL을 출력한다.
 * ddl-auto : JPA는 테이블을 자동으로 생성하는 기능을 제공하는데 none 를 사용하면 해당 기능을 끈다.
   * create 를 사용하면 엔티티 정보를 바탕으로 테이블도 직접 생성해준다. (기존 테이블 지우고 새로 생성함)   
 
 ```java
-
 package hello.hellospring.repository;
 
 import hello.hellospring.domain.Member;
@@ -527,14 +521,16 @@ public interface SpringDataJpaMemberRepository extends JpaRepository<Member,
     
 **스프링 데이터 JPA 제공 기능**   
 * 인터페이스를 통한 기본적인 CRUD     
-* findByName() , findByEmail() 처럼 메서드 이름 만으로 조회 기능 제공     
+* `findByName()`, `findByEmail()` 처럼 메서드 이름 만으로 조회 기능 제공     
 * 페이징 기능 자동 제공   
       
 ![JpaRepositoryDependencies.png](./images/JpaRepositoryDependencies.png)            
     
-> 참고: 실무에서는 JPA와 스프링 데이터 JPA를 기본으로 사용하고, 복잡한 동적 쿼리는 Querydsl이라는 라이브러리를 사용하면 된다.     
-Querydsl을 사용하면 쿼리도 자바 코드로 안전하게 작성할 수 있고, 동적 쿼리도 편리하게 작성할 수 있다.       
-이 조합으로 해결하기 어려운 쿼리는 JPA가 제공하는 네이티브 쿼리를 사용하거나, 앞서 학습한 스프링 JdbcTemplate를 사용하면 된다.         
+> 참고: 실무에서는 JPA와 스프링 데이터 JPA를 기본으로 사용하고,   
+> 복잡한 동적 쿼리는 Querydsl이라는 라이브러리를 사용하면 된다.     
+> Querydsl을 사용하면 쿼리도 자바 코드로 안전하게 작성할 수 있고, 동적 쿼리도 편리하게 작성할 수 있다.         
+> 이 조합으로 해결하기 어려운 쿼리는 JPA가 제공하는 네이티브 쿼리를 사용하거나,   
+> 앞서 학습한 스프링 JdbcTemplate를 사용하면 된다.         
        
 스프링 데이터 JPA는 **` JpaRepository<V, K>,`를 상속한 인터페이스를 알아서 구현해주고 스프링 빈으로 자동 등록해준다.**         
 이 과정에서 `@Repository` 어노테이션도 붙여줘야 하지만, 생략해도 되게 해주는 장점이 있다.          
@@ -545,9 +541,9 @@ Querydsl을 사용하면 쿼리도 자바 코드로 안전하게 작성할 수 �
 * 모든 메서드의 호출 시간을 측정하고 싶다면?        
 * 공통 관심사항 VS 핵심 관심사항      
 * 회원 가입 시간, 회원 조회 시간을 측정하고 싶다면?    
-         
-AOP에 대해서는 이미 다른 곳에 정리했기에 깊게는 안들어가겠습니다.  
-   
+           
+AOP에 대해서 보다 자세한 내용은 [필자가 정리해놓은 내용](https://github.com/kwj1270/TIL_Seminar/blob/master/AOP.md)을 참고하자     
+    
 **AOP의 장점**   
 * 회원가입, 회원 조회등 핵심 관심사항과 시간을 측정하는 공통 관심 사항을 분리한다.
 * 시간을 측정하는 로직을 별도의 공통 로직으로 만들었다.
@@ -563,13 +559,12 @@ AOP에 대해서는 이미 다른 곳에 정리했기에 깊게는 안들어가�
 * 마찬가지로 `joinPoint`도 실제 인스턴스는 아니다. 
 * `joinPoint.proceed()`를 통해 실제 인스턴스의 메서드를 실행시키는 것이다.   
 
-AOP와 프록시에 대해서 공부를 해야겠다.   
-
-## 다음으로
-지금까지 스프링으로 웹 애플리케이션을 개발하는 방법에 대해서 얇고 넓게 학습했다.       
-이제부터는 **각각의 기술들을 깊이있게 이해해야 한다.**         
-거대한 스프링의 **모든 것을 세세하게 알 필요는 없다.** 우리는 스프링을 만드는 개발자가 아니다.        
-**스프링을 활용해서 실무에서 발생하는 문제들을 잘 해결하는 것이 훨씬 중요하다.**       
-따라서 **핵심 원리를 이해하고, 문제가 발생했을 때, 대략 어디쯤 부터 찾아들어가면 될지, 필요한 부분을 찾아서 사용할 수 있는 능력이 더 중요하다.**    
-   
+## 다음으로   
+지금까지 스프링으로 웹 애플리케이션을 개발하는 방법에 대해서 얇고 넓게 학습했다.         
+이제부터는 **각각의 기술들을 깊이있게 이해해야 한다.**           
+거대한 스프링의 **모든 것을 세세하게 알 필요는 없다.** 우리는 스프링을 만드는 개발자가 아니다.          
+**스프링을 활용해서 실무에서 발생하는 문제들을 잘 해결하는 것이 훨씬 중요하다.**         
+따라서 **핵심 원리를 이해하고, 문제가 발생했을 때,     
+대략 어디쯤 부터 찾아들어가면 될지, 필요한 부분을 찾아서 사용할 수 있는 능력이 더 중요하다.**       
+      
    
